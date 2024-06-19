@@ -1,6 +1,9 @@
 {
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@flatten-js/core": "^1.5.4",
+    "@mui/joy": "^5.0.0-beta.36",
     "@react-spring/three": "^9.7.3",
     "@react-three/drei": "^9.106.0",
     "@react-three/fiber": "^8.16.8",

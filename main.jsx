@@ -3,21 +3,17 @@ import { useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
-import { DSeat, dSeatStickPoints } from './seat.jsx'
-import { Armbow, armbowStickPoints } from './armbow.jsx'
+import { DSeat, dSeatStickPoints, SeatControls } from './seat.jsx'
+import { Armbow, armbowStickPoints, ArmbowControls } from './armbow.jsx'
 import { graduateCumulative } from './graduate.js'
-import { Sticks } from './sticks.jsx'
-
-const Slider = ({title, min, max, step, value, format, hideValue, onChange}) => {
-  const formatted = format ? format(value) : value
-  return <div>
-    <label>{title}{hideValue ? "" : `: ${formatted}`}</label>
-    <input type="range"
-      min={min} max={max} step={step ?? 1} value={value}
-      onChange={e => onChange(e.target.value-0)} 
-    />
-  </div>
-}
+import { Sticks, StickControls } from './sticks.jsx'
+import Container from '@mui/joy/Container'
+import Box from '@mui/joy/Box'
+import Tabs from '@mui/joy/Tabs'
+import TabList from '@mui/joy/TabList'
+import Tab from '@mui/joy/Tab'
+import TabPanel from '@mui/joy/TabPanel'
+import { CssVarsProvider, extendTheme } from '@mui/joy/styles'
 
 const App = () => {
   const [seatState, setSeatState] = useState({
@@ -38,12 +34,9 @@ const App = () => {
 
   const [stickState, setStickState] = useState({
     number: 8,
-    variation: 1.2,
+    variation: 0.9,
     thickness: 20
   })
-
-  const onChange = (stateGetter, stateSetter, id) => (value) =>
-    stateSetter({...stateGetter, [id]: value})
 
   const seatPoints = dSeatStickPoints(
     seatState,
@@ -55,22 +48,46 @@ const App = () => {
     length => graduateCumulative(length, stickState.number-1, stickState.variation)
   )
 
-  return <>
+  const customTheme = extendTheme({
+    fontFamily: {
+      display: 'Source Sans 3',
+      body: 'Source Sans 3'
+    }
+  })
+
+  const viz = <Box sx={{height: "40vh"}}>
     <Canvas camera={{near: 1, far: 2000, position: [0, 1000, 1000]}}>
-      <OrbitControls/>
+      <OrbitControls minDistance={300} maxDistance={1000}/>
       <ambientLight color="white" intensity={2}/>
       <directionalLight position={[0, 1000, 1000]} color="white" intensity={2}/>
       <DSeat {...seatState}/>
       <Armbow {...armbowState}/>
       <Sticks starts={seatPoints} ends={armbowPoints} thickness={stickState.thickness}/>
     </Canvas>
-    <Slider id="sticks" title="Sticks"
-      min={3} max={12} step={1}
-      value={stickState.number} onChange={onChange(stickState, setStickState, "number")}/>
-    <Slider id="variation" title="Variation"
-      min={0.5} max={2} step={0.1} hideValue={false}
-      value={stickState.variation} onChange={onChange(stickState, setStickState, "variation")}/>
-  </>
+  </Box>
+
+  const controls = <Tabs defaultValue={0}>
+    <TabList>
+      <Tab>Seat</Tab>
+      <Tab>Armbow</Tab>
+      <Tab>Sticks</Tab>
+    </TabList>
+    <TabPanel value={0}>
+      <SeatControls state={seatState} setState={setSeatState}/>
+    </TabPanel>
+    <TabPanel value={1}>
+      <ArmbowControls state={armbowState} setState={setArmbowState}/>
+    </TabPanel>
+    <TabPanel value={2}>
+      <StickControls state={stickState} setState={setStickState}/>
+    </TabPanel>
+  </Tabs>
+
+  return <CssVarsProvider theme={customTheme}>
+    <Container maxWidth="sm">
+      {viz}{controls}
+    </Container>
+  </CssVarsProvider>
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(
