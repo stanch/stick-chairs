@@ -3,10 +3,10 @@ import { useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
-import { DSeat, dSeatStickPoints, SeatControls } from './seat.jsx'
-import { Armbow, armbowStickPoints, ArmbowControls } from './armbow.jsx'
-import { graduateCumulative } from './graduate.js'
-import { Sticks, StickControls } from './sticks.jsx'
+import { DSeat, dSeatStickPoints, SeatControls, DSeatStickPointDiagram } from './seat'
+import { Armbow, armbowStickPoints, ArmbowControls, ArmbowStickPointDiagram } from './armbow'
+import { graduateCumulative } from './graduate'
+import { Sticks, StickControls } from './sticks'
 import Container from '@mui/joy/Container'
 import Box from '@mui/joy/Box'
 import Tabs from '@mui/joy/Tabs'
@@ -60,15 +60,17 @@ const App = () => {
       <OrbitControls minDistance={300} maxDistance={1000}/>
       <ambientLight color="white" intensity={2}/>
       <directionalLight position={[0, 1000, 1000]} color="white" intensity={2}/>
+      <directionalLight position={[0, -1000, 1000]} color="white" intensity={2}/>
       <DSeat {...seatState}/>
       <Armbow {...armbowState}/>
       <Sticks starts={seatPoints} ends={armbowPoints} thickness={stickState.thickness}/>
     </Canvas>
   </Box>
 
-  const controls = <Tabs defaultValue={0}>
-    <TabList>
+  const controls = <Tabs defaultValue={0} sx={{height: "50vh", overflowY: "auto"}}>
+    <TabList sticky="top">
       <Tab>Seat</Tab>
+      <Tab>Legs</Tab>
       <Tab>Armbow</Tab>
       <Tab>Sticks</Tab>
     </TabList>
@@ -76,16 +78,40 @@ const App = () => {
       <SeatControls state={seatState} setState={setSeatState}/>
     </TabPanel>
     <TabPanel value={1}>
-      <ArmbowControls state={armbowState} setState={setArmbowState}/>
+      TBD
     </TabPanel>
     <TabPanel value={2}>
+      <ArmbowControls state={armbowState} setState={setArmbowState}/>
+    </TabPanel>
+    <TabPanel value={3}>
       <StickControls state={stickState} setState={setStickState}/>
+    </TabPanel>
+  </Tabs>
+
+  const diagrams = <Tabs defaultValue={0} sx={{height: "90vh", overflowY: "auto"}}>
+    <TabList sticky="top">
+      <Tab>Sticks</Tab>
+    </TabList>
+    <TabPanel value={0}>
+      <DSeatStickPointDiagram {...seatState} points={seatPoints}/>
+      <ArmbowStickPointDiagram {...armbowState} points={armbowPoints}/>
     </TabPanel>
   </Tabs>
 
   return <CssVarsProvider theme={customTheme}>
     <Container maxWidth="sm">
-      {viz}{controls}
+      <Tabs defaultValue={0}>
+        <TabList sticky="top" tabFlex={1}>
+          <Tab>Designing</Tab>
+          <Tab>Marking out</Tab>
+        </TabList>
+        <TabPanel value={0}>
+          {viz}{controls}
+        </TabPanel>
+        <TabPanel value={1}>
+          {diagrams}
+        </TabPanel>
+      </Tabs>
     </Container>
   </CssVarsProvider>
 }

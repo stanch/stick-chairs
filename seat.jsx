@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import * as THREE from 'three'
 import { useMemo } from 'react'
 import { Arc, Point } from '@flatten-js/core'
@@ -7,6 +8,7 @@ import FormControl from '@mui/joy/FormControl'
 import FormLabel from '@mui/joy/FormLabel'
 import Stack from '@mui/joy/Stack'
 import Slider from '@mui/joy/Slider'
+import { pointDistanceMarks, pointMarks } from './utils'
 
 export const DSeat = ({radius, extent, thickness}) => {
   const shape = useMemo(() => {
@@ -31,6 +33,22 @@ export const dSeatStickPoints = ({radius, extent, thickness, stickMargin}, split
   return points
     .map(p => arc.pointAtLength(Math.min(p, arc.length)))
     .map(p => ({x: p.x, z: -p.y, y: thickness}))
+}
+
+export const DSeatStickPointDiagram = ({radius, extent, stickMargin, points}) => {
+  const seatArc = new Arc(new Point(0, extent), radius, 0, Math.PI)
+    .svg().match(/d="([^"]+)"/)[1]
+  const stickArc = new Arc(new Point(0, extent), radius-stickMargin, 0, Math.PI)
+    .svg().match(/d="([^"]+)"/)[1]
+  const localPoints = points.map(p => new Point(p.x, -p.z))
+
+  return <svg viewBox={`${-radius-15} -15 ${radius*2+30} ${radius+extent+30}`}>
+    <rect x={-radius} y1={0} width={radius*2} height={extent} fill="#ddd" stroke="none"/>
+    <path d={seatArc} fill="#ddd" stroke="none"/>
+    <path d={stickArc} fill="none" stroke="black" strokeDasharray="4"/>
+    {pointMarks(localPoints)}
+    {pointDistanceMarks(localPoints)}
+  </svg>
 }
 
 export const SeatControls = ({state, setState}) => {

@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import * as THREE from 'three'
 import { useMemo } from 'react'
 import { Arc, Point } from '@flatten-js/core'
@@ -5,6 +6,7 @@ import FormControl from '@mui/joy/FormControl'
 import FormLabel from '@mui/joy/FormLabel'
 import Stack from '@mui/joy/Stack'
 import Slider from '@mui/joy/Slider'
+import { pointDistanceMarks, pointMarks } from './utils'
 
 export const Armbow = ({radius, extent, width, thickness, height, shift}) => {
   const shape = useMemo(() => {
@@ -33,6 +35,23 @@ export const armbowStickPoints = ({radius, extent, width, height, shift}, splitt
   return points
     .map(p => arc.pointAtLength(Math.min(p, arc.length)))
     .map(p => ({x: p.x, z: -p.y, y: height}))
+}
+
+export const ArmbowStickPointDiagram = ({radius, extent, width, shift, points}) => {
+  const stickArc = new Arc(new Point(0, extent), radius+width/2, 0, Math.PI)
+    .svg().match(/d="([^"]+)"/)[1]
+  const localPoints = points.map(p => new Point(p.x, -shift-p.z))
+
+  return <svg viewBox={`${-radius-width-15} ${-15-width/2} ${(radius+width)*2+30} ${extent+radius+width*1.5+30}`}>
+    <circle r={width/2} cx={-radius-width/2} cy={0} fill="#ddd"/>
+    <circle r={width/2} cx={radius+width/2} cy={0} fill="#ddd"/>
+    <rect x={-radius-width} y={0} width={width} height={extent} fill="#ddd"/>
+    <rect x={radius} y={0} width={width} height={extent} fill="#ddd"/>
+    <path d={stickArc} fill="none" stroke="#ddd" strokeWidth={width}/>
+    <path d={stickArc} fill="none" stroke="black" strokeDasharray="4"/>
+    {pointMarks(localPoints)}
+    {pointDistanceMarks(localPoints)}
+  </svg>
 }
 
 export const ArmbowControls = ({state, setState}) => {
