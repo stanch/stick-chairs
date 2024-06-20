@@ -58,7 +58,7 @@ const App = () => {
   const viz = <Box sx={{height: "40vh"}}>
     <Canvas camera={{near: 1, far: 2000, position: [0, 1000, 1000]}}>
       <OrbitControls minDistance={300} maxDistance={1000}/>
-      <ambientLight color="white" intensity={2}/>
+      <ambientLight color="white" intensity={0.1}/>
       <directionalLight position={[0, 1000, 1000]} color="white" intensity={2}/>
       <directionalLight position={[0, -1000, 1000]} color="white" intensity={2}/>
       <DSeat {...seatState}/>
