@@ -3,8 +3,9 @@ import { useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
-import { DSeat, dSeatStickPoints, SeatControls, DSeatStickPointDiagram } from './seat'
-import { Armbow, armbowStickPoints, ArmbowControls, ArmbowStickPointDiagram } from './armbow'
+import { BasicControls } from './basics'
+import { Seat, seatStickPoints, SeatControls, SeatStickPointDiagram } from './seat'
+import { Armbow, armbowShift, armbowStickPoints, ArmbowControls, ArmbowStickPointDiagram } from './armbow'
 import { graduateCumulative } from './graduate'
 import { Sticks, StickControls } from './sticks'
 import Container from '@mui/joy/Container'
@@ -16,6 +17,10 @@ import TabPanel from '@mui/joy/TabPanel'
 import { CssVarsProvider, extendTheme } from '@mui/joy/styles'
 
 const App = () => {
+  const [basicState, setBasicState] = useState({
+    backAngle: 14
+  })
+
   const [seatState, setSeatState] = useState({
     radius: 250,
     extent: 140,
@@ -28,7 +33,6 @@ const App = () => {
     extent: 50,
     width: 50,
     height: 210,
-    shift: 100,
     thickness: 20
   })
 
@@ -38,13 +42,15 @@ const App = () => {
     thickness: 20
   })
 
-  const seatPoints = dSeatStickPoints(
+  const shift = armbowShift(basicState, seatState, armbowState)
+
+  const seatPoints = seatStickPoints(
     seatState,
     length => graduateCumulative(length, stickState.number-1, 1)
   )
 
   const armbowPoints = armbowStickPoints(
-    armbowState,
+    {...armbowState, shift},
     length => graduateCumulative(length, stickState.number-1, stickState.variation)
   )
 
@@ -61,29 +67,33 @@ const App = () => {
       <ambientLight color="white" intensity={0.1}/>
       <directionalLight position={[0, 1000, 1000]} color="white" intensity={2}/>
       <directionalLight position={[0, -1000, 1000]} color="white" intensity={2}/>
-      <DSeat {...seatState}/>
-      <Armbow {...armbowState}/>
+      <Seat {...seatState}/>
+      <Armbow {...armbowState} shift={shift}/>
       <Sticks starts={seatPoints} ends={armbowPoints} thickness={stickState.thickness}/>
     </Canvas>
   </Box>
 
   const controls = <Tabs defaultValue={0} sx={{height: "50vh", overflowY: "auto"}}>
     <TabList sticky="top">
+      <Tab>Basics</Tab>
       <Tab>Seat</Tab>
       <Tab>Legs</Tab>
       <Tab>Armbow</Tab>
       <Tab>Sticks</Tab>
     </TabList>
     <TabPanel value={0}>
-      <SeatControls state={seatState} setState={setSeatState}/>
+      <BasicControls state={basicState} setState={setBasicState}/>
     </TabPanel>
     <TabPanel value={1}>
-      TBD
+      <SeatControls state={seatState} setState={setSeatState}/>
     </TabPanel>
     <TabPanel value={2}>
-      <ArmbowControls state={armbowState} setState={setArmbowState}/>
+      TBD
     </TabPanel>
     <TabPanel value={3}>
+      <ArmbowControls state={armbowState} setState={setArmbowState}/>
+    </TabPanel>
+    <TabPanel value={4}>
       <StickControls state={stickState} setState={setStickState}/>
     </TabPanel>
   </Tabs>
@@ -93,8 +103,8 @@ const App = () => {
       <Tab>Sticks</Tab>
     </TabList>
     <TabPanel value={0}>
-      <DSeatStickPointDiagram {...seatState} points={seatPoints}/>
-      <ArmbowStickPointDiagram {...armbowState} points={armbowPoints}/>
+      <SeatStickPointDiagram {...seatState} points={seatPoints}/>
+      <ArmbowStickPointDiagram {...armbowState} shift={shift} points={armbowPoints}/>
     </TabPanel>
   </Tabs>
 

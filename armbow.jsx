@@ -26,6 +26,12 @@ export const Armbow = ({radius, extent, width, thickness, height, shift}) => {
   </mesh>
 }
 
+export const armbowShift = ({backAngle}, seat, {extent, radius, width, height}) => {
+  const seatStickPosition = seat.extent + seat.radius - seat.stickMargin
+  const targetArmbowPosition = seatStickPosition + Math.tan(backAngle * Math.PI/180) * height
+  return targetArmbowPosition - (extent + radius + width/2)
+}
+
 export const armbowStickPoints = ({radius, extent, width, height, shift}, splitter) => {
   const arc = new Arc(new Point(0, extent+shift), radius+width/2, 0, Math.PI)
   const points = splitter(arc.length)
@@ -52,7 +58,7 @@ export const ArmbowStickPointDiagram = ({radius, extent, width, shift, points}) 
 }
 
 export const ArmbowControls = ({state, setState}) => {
-  return <Controls mt={1}>
+  return <Controls>
     <Control label="Radius">
       <Slider value={state.radius} valueLabelDisplay="on"
         min={250} max={350} step={10} marks
@@ -67,11 +73,6 @@ export const ArmbowControls = ({state, setState}) => {
       <Slider value={state.height} valueLabelDisplay="on"
         min={150} max={250} step={10} marks
         onChange={(event, value) => setState({...state, height: value})} />
-    </Control>
-    <Control label="Shift">
-      <Slider value={state.shift} valueLabelDisplay="on"
-        min={0} max={300} step={50} marks
-        onChange={(event, value) => setState({...state, shift: value})} />
     </Control>
     <Control label="Width">
       <Slider value={state.width} valueLabelDisplay="on"

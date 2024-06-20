@@ -7,7 +7,7 @@ import Option from '@mui/joy/Option'
 import Slider from '@mui/joy/Slider'
 import { pointDistanceMarks, pointMarks, Controls, Control } from './utils'
 
-export const DSeat = ({radius, extent, thickness}) => {
+export const Seat = ({radius, extent, thickness}) => {
   const shape = useMemo(() => {
     const s = new THREE.Shape()
     s.moveTo(radius, 0)
@@ -24,7 +24,7 @@ export const DSeat = ({radius, extent, thickness}) => {
   </mesh>
 }
 
-export const dSeatStickPoints = ({radius, extent, thickness, stickMargin}, splitter) => {
+export const seatStickPoints = ({radius, extent, thickness, stickMargin}, splitter) => {
   const arc = new Arc(new Point(0, extent), radius-stickMargin, 0, Math.PI)
   const points = splitter(arc.length)
   return points
@@ -32,7 +32,7 @@ export const dSeatStickPoints = ({radius, extent, thickness, stickMargin}, split
     .map(p => ({x: p.x, z: -p.y, y: thickness}))
 }
 
-export const DSeatStickPointDiagram = ({radius, extent, stickMargin, points}) => {
+export const SeatStickPointDiagram = ({radius, extent, stickMargin, points}) => {
   const seatArc = new Arc(new Point(0, extent), radius, 0, Math.PI)
     .svg().match(/d="([^"]+)"/)[1]
   const stickArc = new Arc(new Point(0, extent), radius-stickMargin, 0, Math.PI)
@@ -50,11 +50,6 @@ export const DSeatStickPointDiagram = ({radius, extent, stickMargin, points}) =>
 
 export const SeatControls = ({state, setState}) => {
   return <Controls>
-    <Control>
-      <Select defaultValue="d">
-        <Option value="d">D-shaped</Option>
-      </Select>
-    </Control>
     <Control label="Radius">
       <Slider value={state.radius} valueLabelDisplay="on"
         min={250} max={350} step={10} marks

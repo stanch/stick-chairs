@@ -22,8 +22,10 @@ export const pointMarks = points =>
     <circle key={i} r={4} cx={p.x} cy={p.y} fill="none" stroke="black"/>
   )
 
-export const Controls = props =>
-  <Grid container justifyContent="center" alignItems="center" rowSpacing={3} {...props}/>
+export const Controls = ({children}) =>
+  <Grid container justifyContent="center" alignItems="center" rowSpacing={3} mt={1}>
+    {children}
+  </Grid>
 
 export const Control = ({label, children}) =>
   <>

@@ -29,7 +29,7 @@ export const Sticks = ({starts, ends, thickness}) =>
   </>
 
 export const StickControls = ({state, setState}) => {
-  return <Controls mt={1}>
+  return <Controls>
     <Control label="Number of sticks">
       <Slider value={state.number} valueLabelDisplay="on"
         min={3} max={12} marks
