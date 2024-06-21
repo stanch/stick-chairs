@@ -1,13 +1,13 @@
 import _ from 'lodash'
 import * as THREE from 'three'
 import { useMemo } from 'react'
-import { Arc, Point } from '@flatten-js/core'
-import Select from '@mui/joy/Select'
-import Option from '@mui/joy/Option'
+import { Arc, Point, Segment, Multiline, Line } from '@flatten-js/core'
 import Slider from '@mui/joy/Slider'
 import { pointDistanceMarks, pointMarks, Controls, Control } from './utils'
 
-export const Seat = ({radius, extent, thickness}) => {
+export const Seat = ({width, depth, thickness}) => {
+  const radius = width/2
+  const extent = depth - radius
   const shape = useMemo(() => {
     const s = new THREE.Shape()
     s.moveTo(radius, 0)
@@ -24,7 +24,9 @@ export const Seat = ({radius, extent, thickness}) => {
   </mesh>
 }
 
-export const seatStickPoints = ({radius, extent, thickness, stickMargin}, splitter) => {
+export const seatStickPoints = ({width, depth, thickness, stickMargin}, splitter) => {
+  const radius = width/2
+  const extent = depth - radius
   const arc = new Arc(new Point(0, extent), radius-stickMargin, 0, Math.PI)
   const points = splitter(arc.length)
   return points
@@ -32,7 +34,23 @@ export const seatStickPoints = ({radius, extent, thickness, stickMargin}, splitt
     .map(p => ({x: p.x, z: -p.y, y: thickness}))
 }
 
-export const SeatStickPointDiagram = ({radius, extent, stickMargin, points}) => {
+export const seatLegPoints = ({width, depth}, {frontOffset, backOffset, edgeOffset}) => {
+  const radius = width/2
+  const extent = depth - radius
+  const arc = new Arc(new Point(0, extent), radius-edgeOffset, 0, Math.PI)
+  const find = o => {
+    if (o > extent) {
+      return arc.intersect(new Line(new Point(-radius, o), new Point(radius, o)))
+    }
+    return [new Point(-radius+edgeOffset, o), new Point(radius-edgeOffset, o)]
+  }
+  const points = [...find(frontOffset), ...find(depth-backOffset)]
+  return points.map(p => ({x: p.x, z: -p.y, y: 0}))
+}
+
+export const SeatStickPointDiagram = ({width, depth, stickMargin, points}) => {
+  const radius = width/2
+  const extent = depth - radius
   const seatArc = new Arc(new Point(0, extent), radius, 0, Math.PI)
     .svg().match(/d="([^"]+)"/)[1]
   const stickArc = new Arc(new Point(0, extent), radius-stickMargin, 0, Math.PI)
@@ -50,15 +68,19 @@ export const SeatStickPointDiagram = ({radius, extent, stickMargin, points}) => 
 
 export const SeatControls = ({state, setState}) => {
   return <Controls>
-    <Control label="Radius">
-      <Slider value={state.radius} valueLabelDisplay="on"
-        min={250} max={350} step={10} marks
-        onChange={(event, value) => setState({...state, radius: value})} />
+    <Control label="Width">
+      <Slider value={state.width} valueLabelDisplay="on"
+        min={500} max={700} step={20} marks
+        onChange={(event, value) => setState({
+          ...state,
+          width: value,
+          depth: Math.min(Math.max(state.depth, state.width/2+50), state.width/2+200)
+        })} />
     </Control>
-    <Control label="Straight section">
-      <Slider value={state.extent} valueLabelDisplay="on"
-        min={0} max={200} step={10} marks
-        onChange={(event, value) => setState({...state, extent: value})} />
+    <Control label="Depth">
+      <Slider value={state.depth} valueLabelDisplay="on"
+        min={Math.max(state.width/2+50, 330)} max={Math.min(state.width/2+200, 430)} step={10} marks
+        onChange={(event, value) => setState({...state, depth: value})} />
     </Control>
     <Control label="Thickness">
       <Slider value={state.thickness} valueLabelDisplay="on"

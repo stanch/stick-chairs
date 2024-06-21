@@ -27,7 +27,7 @@ export const Armbow = ({radius, extent, width, thickness, height, shift}) => {
 }
 
 export const armbowShift = ({backAngle}, seat, {extent, radius, width, height}) => {
-  const seatStickPosition = seat.extent + seat.radius - seat.stickMargin
+  const seatStickPosition = seat.depth - seat.stickMargin
   const targetArmbowPosition = seatStickPosition + Math.tan(backAngle * Math.PI/180) * height
   return targetArmbowPosition - (extent + radius + width/2)
 }

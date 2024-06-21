@@ -4,7 +4,8 @@ import ReactDOM from 'react-dom/client'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { BasicControls } from './basics'
-import { Seat, seatStickPoints, SeatControls, SeatStickPointDiagram } from './seat'
+import { Seat, seatLegPoints, seatStickPoints, SeatControls, SeatStickPointDiagram } from './seat'
+import { Legs, Floor, LegControls } from './legs'
 import { Armbow, armbowShift, armbowStickPoints, ArmbowControls, ArmbowStickPointDiagram } from './armbow'
 import { graduateCumulative } from './graduate'
 import { Sticks, StickControls } from './sticks'
@@ -18,14 +19,28 @@ import { CssVarsProvider, extendTheme } from '@mui/joy/styles'
 
 const App = () => {
   const [basicState, setBasicState] = useState({
+    seatHeight: 450,
+    seatAngle: 3,
     backAngle: 14
   })
 
   const [seatState, setSeatState] = useState({
-    radius: 250,
-    extent: 140,
+    width: 500,
+    depth: 390,
     thickness: 40,
     stickMargin: 25
+  })
+
+  const [legState, setLegState] = useState({
+    thickness: [25, 40],
+    reverseTaper: false,
+    edgeOffset: 70,
+    frontOffset: 50,
+    backOffset: 100,
+    frontSplay: 15,
+    frontRake: 12,
+    backSplay: 16,
+    backRake: 19
   })
 
   const [armbowState, setArmbowState] = useState({
@@ -43,6 +58,8 @@ const App = () => {
   })
 
   const shift = armbowShift(basicState, seatState, armbowState)
+
+  const legPoints = seatLegPoints(seatState, legState)
 
   const seatPoints = seatStickPoints(
     seatState,
@@ -62,11 +79,13 @@ const App = () => {
   })
 
   const viz = <Box sx={{height: "40vh"}}>
-    <Canvas camera={{near: 1, far: 2000, position: [0, 1000, 1000]}}>
+    <Canvas camera={{near: 1, far: 2000, position: [600, 600, 1000]}}>
       <OrbitControls minDistance={300} maxDistance={1000}/>
       <ambientLight color="white" intensity={0.1}/>
       <directionalLight position={[0, 1000, 1000]} color="white" intensity={2}/>
       <directionalLight position={[0, -1000, 1000]} color="white" intensity={2}/>
+      {/* <Floor height={basicState.seatHeight} shift={seatState.depth/2}/> */}
+      <Legs {...legState} height={basicState.seatHeight} points={legPoints}/>
       <Seat {...seatState}/>
       <Armbow {...armbowState} shift={shift}/>
       <Sticks starts={seatPoints} ends={armbowPoints} thickness={stickState.thickness}/>
@@ -78,7 +97,7 @@ const App = () => {
       <Tab>Basics</Tab>
       <Tab>Seat</Tab>
       <Tab>Legs</Tab>
-      <Tab>Armbow</Tab>
+      <Tab>Arms</Tab>
       <Tab>Sticks</Tab>
     </TabList>
     <TabPanel value={0}>
@@ -88,7 +107,7 @@ const App = () => {
       <SeatControls state={seatState} setState={setSeatState}/>
     </TabPanel>
     <TabPanel value={2}>
-      TBD
+      <LegControls state={legState} setState={setLegState}/>
     </TabPanel>
     <TabPanel value={3}>
       <ArmbowControls state={armbowState} setState={setArmbowState}/>
