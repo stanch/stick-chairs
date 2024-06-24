@@ -2,7 +2,8 @@ import _ from 'lodash'
 import * as THREE from 'three'
 import { useMemo } from 'react'
 import Slider from '@mui/joy/Slider'
-import { Controls, Control } from './utils'
+import { Arc, Point, Segment } from '@flatten-js/core'
+import { Controls, Control, pointMarks, pointDistanceMarks } from './utils'
 
 const Stick = ({start, end, thickness}) => {
   const startVector = new THREE.Vector3(start.x, start.y, start.z)
@@ -27,6 +28,38 @@ export const Sticks = ({starts, ends, thickness}) =>
       <Stick key={i} start={start} end={end} thickness={thickness}/>
     )}
   </>
+
+export const baseStickDiagram = (extent, radius, margin, points) => {
+  const center = new Point(0, extent)
+  const arc = new Arc(center, radius-margin, 0, Math.PI)
+    .svg().match(/d="([^"]+)"/)[1]
+
+  const withExtraPoint = points.length % 2 ?
+    points :
+    [
+      ..._.take(points, points.length / 2),
+      new Segment(
+        points[points.length / 2 - 1],
+        points[points.length / 2]
+      ).middle(),
+      ..._.takeRight(points, points.length / 2)
+    ]
+
+  const middlePoint = points[Math.floor((points.length+1)/2)]
+  const outerPoint = center.translate(
+    new Segment(center, middlePoint).tangentInStart().multiply(radius)
+  )
+
+  return <g>
+    <line x1={0} y1={0} x2={0} y2={radius+extent} fill="none" stroke="#666" strokeDasharray="4"/>
+    <line x1={-radius+margin} y1={0} x2={-radius+margin} y2={extent} fill="none" stroke="#666" strokeDasharray="4"/>
+    <line x1={radius-margin} y1={0} x2={radius-margin} y2={extent} fill="none" stroke="#666" strokeDasharray="4"/>
+    <path d={arc} fill="none" stroke="#666" strokeDasharray="4"/>
+    {pointMarks(points)}
+    {pointDistanceMarks(withExtraPoint)}
+    {pointDistanceMarks([middlePoint, outerPoint])}
+  </g>
+}
 
 export const StickControls = ({state, setState}) => {
   return <Controls>

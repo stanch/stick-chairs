@@ -4,9 +4,9 @@ import ReactDOM from 'react-dom/client'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { BasicControls } from './basics'
-import { Seat, seatLegPoints, seatStickPoints, SeatControls, SeatStickPointDiagram } from './seat'
+import { Seat, seatLegPoints, seatStickPoints, SeatControls, SeatDiagram, SeatStickPointDiagram } from './seat'
 import { Legs, Floor, LegControls } from './legs'
-import { Armbow, armbowShift, armbowStickPoints, ArmbowControls, ArmbowStickPointDiagram } from './armbow'
+import { Armbow, armbowShift, armbowStickPoints, ArmbowControls, ArmbowDiagram, ArmbowStickPointDiagram } from './armbow'
 import { graduateCumulative } from './graduate'
 import { Sticks, StickControls } from './sticks'
 import Container from '@mui/joy/Container'
@@ -45,7 +45,7 @@ const App = () => {
 
   const [armbowState, setArmbowState] = useState({
     radius: 250,
-    extent: 50,
+    extent: 75,
     width: 50,
     height: 210,
     thickness: 20
@@ -119,9 +119,17 @@ const App = () => {
 
   const diagrams = <Tabs defaultValue={0} sx={{height: "90vh", overflowY: "auto"}}>
     <TabList sticky="top">
+      <Tab>Seat</Tab>
+      <Tab>Arms</Tab>
       <Tab>Sticks</Tab>
     </TabList>
     <TabPanel value={0}>
+      <SeatDiagram {...seatState}/>
+    </TabPanel>
+    <TabPanel value={1}>
+      <ArmbowDiagram {...armbowState}/>
+    </TabPanel>
+    <TabPanel value={2}>
       <SeatStickPointDiagram {...seatState} points={seatPoints}/>
       <ArmbowStickPointDiagram {...armbowState} shift={shift} points={armbowPoints}/>
     </TabPanel>
