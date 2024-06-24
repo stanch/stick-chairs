@@ -107,8 +107,8 @@ export const SeatLegDiagram = ({width, depth, angles, edgeOffset, points}) => {
     <line x1={radius-edgeOffset} y1={0} x2={radius-edgeOffset} y2={extent} fill="none" stroke="#666" strokeDasharray="4"/>
     <line x1={localPoints[0].x} y1={localPoints[0].y} x2={localPoints[1].x} y2={localPoints[1].y} fill="none" stroke="#666" strokeDasharray="4"/>
     <line x1={localPoints[2].x} y1={localPoints[2].y} x2={localPoints[3].x} y2={localPoints[3].y} fill="none" stroke="#666" strokeDasharray="4"/>
-    <line x1={frontline.start.x} y1={frontline.start.y} x2={frontline.end.x} y2={frontline.end.y} fill="none" stroke="#666" strokeDasharray="4"/>
-    <line x1={backline.start.x} y1={backline.start.y} x2={backline.end.x} y2={backline.end.y} fill="none" stroke="#666" strokeDasharray="4"/>
+    <line x1={frontline.start.x} y1={frontline.start.y} x2={frontline.end.x} y2={frontline.end.y} fill="none" stroke="#666" strokeDasharray="4 4 1 4"/>
+    <line x1={backline.start.x} y1={backline.start.y} x2={backline.end.x} y2={backline.end.y} fill="none" stroke="#666" strokeDasharray="10 4"/>
     {pointMarks(localPoints)}
     {pointDistanceMarks([new Point(0, 0), new Segment(localPoints[0], localPoints[1]).middle()])}
     {pointDistanceMarks([new Segment(localPoints[2], localPoints[3]).middle(), new Point(0, radius+extent)])}

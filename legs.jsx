@@ -2,7 +2,8 @@ import * as THREE from 'three'
 import { useMemo } from 'react'
 import Slider from '@mui/joy/Slider'
 import Switch from '@mui/joy/Switch'
-import { Controls, Control } from './utils'
+import { Point } from '@flatten-js/core'
+import { Controls, Control, arrowMarker, pointDistanceMarks, angleMark } from './utils'
 
 const Leg = ({sightline, lr, fr, resultant, height, thickness, start}) => {
   const length = height / Math.cos(resultant * Math.PI/180) + 10
@@ -46,6 +47,40 @@ export const Floor = ({height, shift}) =>
     <circleGeometry args={[600, 100]} />
     <meshStandardMaterial color="white"/>
   </mesh>
+
+const baseLegDiagram = (resultant, thickness, extent, height, back) => {
+  const s = back ? -1 : 1
+  const path = `
+    M ${-s*thickness[0]/2} 0
+    L ${s*thickness[0]/2} 0
+    L ${s*(-extent+thickness[1]/2)} -${height}
+    L ${s*(-extent-thickness[1]/2)} -${height}`
+  const shift = back ? {transform: "translate(100)"} : {}
+  return <g {...shift}>
+    <path d={path} fill="#ddd" stroke="none"/>
+    <line x1={0} y1={0} x2={0} y2={-height} stroke="#666" strokeDasharray={4}/>
+    <line x1={-40} y1={0} x2={40} y2={0} stroke="#666" strokeDasharray={back ? "10 4" : "4 4 1 4"}/>
+    <text x={0} y={20} textAnchor="middle">
+      {back ? "back leg" : "front leg"}
+    </text>
+    {pointDistanceMarks([new Point(-s*extent, -height), new Point(0, 0)])}
+    {angleMark(
+      new Point(0, 0), back ? -90 : -90-resultant, back ? -90+resultant : -90,
+      {stroke: "white", strokeWidth: 3, paintOrder: "stroke"}
+    )}
+  </g>
+}
+
+export const LegDiagram = ({angles, thickness, reverseTaper, height}) => {
+  const frontExtent = height * Math.tan(angles.front.resultant * Math.PI/180)
+  const backExtent = height * Math.tan(angles.back.resultant * Math.PI/180)
+  const th = reverseTaper ? [thickness[1], thickness[0]] : thickness
+  return <svg viewBox={`${-frontExtent-th[1]/2-15} ${-height-15} ${frontExtent+backExtent+th[1]*2+100+30} ${height+20+30}`}>
+    <defs>{arrowMarker}</defs>
+    {baseLegDiagram(angles.front.resultant, th, frontExtent, height, false)}
+    {baseLegDiagram(angles.back.resultant, th, backExtent, height, true)}
+  </svg>
+}
 
 export const LegControls = ({state, setState}) => {
   return <Controls>

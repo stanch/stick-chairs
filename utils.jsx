@@ -31,7 +31,7 @@ export const pointDistanceMarks = points =>
       </g>
     })
 
-export const angleMark = (point, start, end) => {
+export const angleMark = (point, start, end, customStroke) => {
   const arc = new Arc(point, 30, start * Math.PI/180, end * Math.PI/180)
     .svg().match(/d="([^"]+)"/)[1]
 
@@ -41,10 +41,11 @@ export const angleMark = (point, start, end) => {
 
   return <g>
     <text x={textLocation.x} y={textLocation.y}
-      dominantBaseline="middle" textAnchor="middle">
+      dominantBaseline="middle" textAnchor="middle"
+      {...customStroke}>
       {Math.round(end-start)}˚
     </text>
-    <path d={arc} stroke="#444" fill="none" stroke-width={1.5}/>
+    <path d={arc} stroke="#444" fill="none" strokeWidth={1.5}/>
   </g>
 }
 

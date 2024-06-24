@@ -5,12 +5,13 @@ import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { BasicControls } from './basics'
 import { Seat, seatLegPoints, seatStickPoints, SeatControls, SeatDiagram, SeatLegDiagram, SeatStickDiagram } from './seat'
-import { Legs, legAngles, Floor, LegControls } from './legs'
+import { Legs, legAngles, Floor, LegDiagram, LegControls } from './legs'
 import { Armbow, armbowShift, armbowStickPoints, ArmbowControls, ArmbowDiagram, ArmbowStickDiagram } from './armbow'
 import { graduateCumulative } from './graduate'
 import { Sticks, StickControls } from './sticks'
 import Container from '@mui/joy/Container'
 import Box from '@mui/joy/Box'
+import Grid from '@mui/joy/Grid'
 import Tabs from '@mui/joy/Tabs'
 import TabList from '@mui/joy/TabList'
 import Tab from '@mui/joy/Tab'
@@ -86,7 +87,7 @@ const App = () => {
       <directionalLight position={[0, 1000, 1000]} color="white" intensity={2}/>
       <directionalLight position={[0, -1000, 1000]} color="white" intensity={2}/>
       {/* <Floor height={basicState.seatHeight} shift={seatState.depth/2}/> */}
-      <Legs {...legState} angles={angles} height={basicState.seatHeight} points={legPoints}/>
+      <Legs {...legState} angles={angles} height={basicState.seatHeight-seatState.thickness} points={legPoints}/>
       <Seat {...seatState}/>
       <Armbow {...armbowState} shift={shift}/>
       <Sticks starts={seatPoints} ends={armbowPoints} thickness={stickState.thickness}/>
@@ -130,6 +131,7 @@ const App = () => {
     </TabPanel>
     <TabPanel value={1}>
       <SeatLegDiagram {...seatState} angles={angles} edgeOffset={legState.edgeOffset} points={legPoints}/>
+      <LegDiagram {...legState} height={basicState.seatHeight-seatState.thickness} angles={angles}/>
     </TabPanel>
     <TabPanel value={2}>
       <ArmbowDiagram {...armbowState}/>
