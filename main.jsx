@@ -4,9 +4,9 @@ import ReactDOM from 'react-dom/client'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { BasicControls } from './basics'
-import { Seat, seatLegPoints, seatStickPoints, SeatControls, SeatDiagram, SeatStickPointDiagram } from './seat'
-import { Legs, Floor, LegControls } from './legs'
-import { Armbow, armbowShift, armbowStickPoints, ArmbowControls, ArmbowDiagram, ArmbowStickPointDiagram } from './armbow'
+import { Seat, seatLegPoints, seatStickPoints, SeatControls, SeatDiagram, SeatLegDiagram, SeatStickDiagram } from './seat'
+import { Legs, legAngles, Floor, LegControls } from './legs'
+import { Armbow, armbowShift, armbowStickPoints, ArmbowControls, ArmbowDiagram, ArmbowStickDiagram } from './armbow'
 import { graduateCumulative } from './graduate'
 import { Sticks, StickControls } from './sticks'
 import Container from '@mui/joy/Container'
@@ -60,6 +60,7 @@ const App = () => {
   const shift = armbowShift(basicState, seatState, armbowState)
 
   const legPoints = seatLegPoints(seatState, legState)
+  const angles = legAngles(legState)
 
   const seatPoints = seatStickPoints(
     seatState,
@@ -85,7 +86,7 @@ const App = () => {
       <directionalLight position={[0, 1000, 1000]} color="white" intensity={2}/>
       <directionalLight position={[0, -1000, 1000]} color="white" intensity={2}/>
       {/* <Floor height={basicState.seatHeight} shift={seatState.depth/2}/> */}
-      <Legs {...legState} height={basicState.seatHeight} points={legPoints}/>
+      <Legs {...legState} angles={angles} height={basicState.seatHeight} points={legPoints}/>
       <Seat {...seatState}/>
       <Armbow {...armbowState} shift={shift}/>
       <Sticks starts={seatPoints} ends={armbowPoints} thickness={stickState.thickness}/>
@@ -120,6 +121,7 @@ const App = () => {
   const diagrams = <Tabs defaultValue={0} sx={{height: "90vh", overflowY: "auto"}}>
     <TabList sticky="top">
       <Tab>Seat</Tab>
+      <Tab>Legs</Tab>
       <Tab>Arms</Tab>
       <Tab>Sticks</Tab>
     </TabList>
@@ -127,11 +129,14 @@ const App = () => {
       <SeatDiagram {...seatState}/>
     </TabPanel>
     <TabPanel value={1}>
-      <ArmbowDiagram {...armbowState}/>
+      <SeatLegDiagram {...seatState} angles={angles} edgeOffset={legState.edgeOffset} points={legPoints}/>
     </TabPanel>
     <TabPanel value={2}>
-      <SeatStickPointDiagram {...seatState} points={seatPoints}/>
-      <ArmbowStickPointDiagram {...armbowState} shift={shift} points={armbowPoints}/>
+      <ArmbowDiagram {...armbowState}/>
+    </TabPanel>
+    <TabPanel value={3}>
+      <SeatStickDiagram {...seatState} points={seatPoints}/>
+      <ArmbowStickDiagram {...armbowState} shift={shift} points={armbowPoints}/>
     </TabPanel>
   </Tabs>
 

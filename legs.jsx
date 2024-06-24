@@ -26,15 +26,18 @@ const toSightlineAndResultant = ({rake, splay}) => {
   return { sightline: sightline / Math.PI*180, resultant: resultant / Math.PI*180 }
 }
 
-export const Legs = ({height, thickness, reverseTaper, frontSplay, frontRake, backSplay, backRake, points}) => {
-  const frontSR = toSightlineAndResultant({rake: frontRake, splay: frontSplay})
-  const backSR = toSightlineAndResultant({rake: backRake, splay: backSplay})
+export const legAngles = ({frontSplay, frontRake, backSplay, backRake}) => ({
+  front: toSightlineAndResultant({rake: frontRake, splay: frontSplay}),
+  back: toSightlineAndResultant({rake: backRake, splay: backSplay})
+})
+
+export const Legs = ({height, thickness, reverseTaper, angles, points}) => {
   const th = reverseTaper ? [thickness[1], thickness[0]] : thickness
   return <>
-    <Leg lr={1} fr={1} {...frontSR} start={points[0]} height={height} thickness={th}/>
-    <Leg lr={-1} fr={1} {...frontSR} start={points[1]} height={height} thickness={th}/>
-    <Leg lr={1} fr={-1} {...backSR} start={points[2]} height={height} thickness={th}/>
-    <Leg lr={-1} fr={-1} {...backSR} start={points[3]} height={height} thickness={th}/>
+    <Leg lr={1} fr={1} {...angles.front} start={points[0]} height={height} thickness={th}/>
+    <Leg lr={-1} fr={1} {...angles.front} start={points[1]} height={height} thickness={th}/>
+    <Leg lr={1} fr={-1} {...angles.back} start={points[2]} height={height} thickness={th}/>
+    <Leg lr={-1} fr={-1} {...angles.back} start={points[3]} height={height} thickness={th}/>
   </>
 }
 

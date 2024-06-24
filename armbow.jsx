@@ -76,7 +76,7 @@ export const ArmbowDiagram = ({radius, extent, width}) => {
   </svg>
 }
 
-export const ArmbowStickPointDiagram = ({radius, extent, width, shift, points}) => {
+export const ArmbowStickDiagram = ({radius, extent, width, shift, points}) => {
   const { armbow } = baseDiagram(radius, extent, width)
   const localPoints = points.map(p => new Point(p.x, -shift-p.z))
 

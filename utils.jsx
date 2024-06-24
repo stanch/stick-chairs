@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { Segment } from '@flatten-js/core'
+import { Arc, Segment } from '@flatten-js/core'
 import Grid from '@mui/joy/Grid'
 
 export const arrowMarker = <marker
@@ -30,6 +30,23 @@ export const pointDistanceMarks = points =>
           stroke="#444"/>
       </g>
     })
+
+export const angleMark = (point, start, end) => {
+  const arc = new Arc(point, 30, start * Math.PI/180, end * Math.PI/180)
+    .svg().match(/d="([^"]+)"/)[1]
+
+  const textLocation = new Segment(point, point.translate(50, 0))
+    .rotate((start + end)/2 * Math.PI/180, point)
+    .end
+
+  return <g>
+    <text x={textLocation.x} y={textLocation.y}
+      dominantBaseline="middle" textAnchor="middle">
+      {Math.round(end-start)}˚
+    </text>
+    <path d={arc} stroke="#444" fill="none" stroke-width={1.5}/>
+  </g>
+}
 
 export const pointMarks = points =>
   points.map((p, i) =>
